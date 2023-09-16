@@ -10,7 +10,7 @@ The project is organized as follows:
 
 ```
 digit-recognizer/
-│|
+│
 ├── html/
 │   └── index.html 
 │
