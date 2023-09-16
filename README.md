@@ -43,7 +43,7 @@ digit-recognizer/
 1. Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/digit-recognizer.git
+git clone https://github.com/TigranZalian/digit-recognizer.git
 ```
 
 2. Navigate to the project directory:
