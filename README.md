@@ -60,21 +60,19 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Uncompress [data.zip](data.zip)
-
-2. Train the model:
+1. Train the model:
 
 ```bash
 python train_model.py
 ```
 
-3. Launch the digit recognition playground to interact with the trained model:
+2. Launch the digit recognition playground to interact with the trained model:
 
 ```bash
 sh serve.sh
 ```
 
-4. Open http://127.0.0.1:3000 to access the playground and test the model in real-time.
+3. Open http://127.0.0.1:3000 to access the playground and test the model in real-time.
 
 ## License
 
