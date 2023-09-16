@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 import zipfile
+import shutil
 
 
 NUM_EPOCHS = 20
@@ -27,6 +28,9 @@ def prepare_data():
     if not os.path.exists(DATA_ZIP_PATH):
         raise Exception(f'The dataset is corrupted. Make sure {DATA_ZIP_PATH} exists.')
     
+    if os.path.exists('data'):
+        shutil.rmtree('data')
+
     with zipfile.ZipFile(DATA_ZIP_PATH) as archive:
         archive.extractall('data')
 
