@@ -1,4 +1,5 @@
-from fastapi import FastAPI, UploadFile, Response
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
 from PIL import Image, ImageEnhance, UnidentifiedImageError
 from tensorflow import keras
@@ -64,7 +65,7 @@ def make_digit_predictions(image_array: np.ndarray[np.floating]):
 @app.get('/')
 def index_endpoint():
     with open('html/index.html', 'r') as f:
-        return Response(content=f.read(), headers={'Content-Type': 'text/html'})
+        return HTMLResponse(f.read())
 
 @app.post('/detect-digit')
 def detect_digit_endpoint(image: UploadFile):
