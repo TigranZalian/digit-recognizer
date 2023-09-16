@@ -20,9 +20,6 @@ model: keras.Sequential = keras.models.load_model(MODEL_NAME)
 plt.switch_backend('Agg')
 setup_dir(IMAGES_DIR)
 
-with open('html/index.html', 'r') as f:
-    index_view = f.read()
-
 def get_plot_data_url(probabilities, predicted_label):
     indices = np.arange(len(probabilities))
 
@@ -66,7 +63,8 @@ def make_digit_predictions(image_array: np.ndarray[np.floating]):
 
 @app.get('/')
 def index_endpoint():
-    return Response(content=index_view, headers={'Content-Type': 'text/html'})
+    with open('html/index.html', 'r') as f:
+        return Response(content=f.read(), headers={'Content-Type': 'text/html'})
 
 @app.post('/detect-digit')
 def detect_digit_endpoint(image: UploadFile):
