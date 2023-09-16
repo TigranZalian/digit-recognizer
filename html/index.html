@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digit Recognition Playground</title>
+  </head>
+  <body>
+    <center>
+      <div style="display: flex; justify-content: center; gap: 100px">
+        <div>
+          <h1>Digit Recognition Playground</h1>
+          <canvas
+            id="drawingCanvas"
+            width="400"
+            height="400"
+            style="border: 1px solid #000; background-color: #fff"
+          ></canvas>
+          <br />
+          <button id="clearButton">Clear Canvas</button>
+          <button id="detectButton">Detect</button>
+        </div>
+        <div id="resultsContainer" style="min-width: 450px">
+          <h1>Detected Digit</h1>
+          <div id="detectedDigit" style="font-size: 200px; font-weight: 500">
+            ~
+          </div>
+        </div>
+      </div>
+    </center>
+
+    <script>
+      const canvas = document.getElementById("drawingCanvas");
+      const detectedDigit = document.getElementById("detectedDigit");
+      const resultsContainer = document.getElementById("resultsContainer");
+      const context = canvas.getContext("2d");
+
+      function initializeCanvas() {
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "#000";
+        context.lineWidth = 17;
+      }
+
+      initializeCanvas();
+
+      let isDrawing = false;
+
+      // Event listeners for mouse actions
+      canvas.addEventListener("mousedown", () => {
+        isDrawing = true;
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+        context.beginPath();
+      });
+
+      canvas.addEventListener("mousemove", draw);
+
+      function draw(e) {
+        if (!isDrawing) return;
+        context.lineTo(
+          e.clientX - canvas.getBoundingClientRect().left,
+          e.clientY - canvas.getBoundingClientRect().top
+        );
+        context.stroke();
+      }
+
+      document.getElementById("clearButton").addEventListener("click", () => {
+        initializeCanvas();
+        resetDetectedDigit();
+      });
+
+      function resetDetectedDigit() {
+        detectedDigit.innerHTML = "~";
+        const plot = document.getElementById("plot");
+        if (plot) {
+          resultsContainer.removeChild(plot);
+        }
+      }
+
+      document.getElementById("detectButton").addEventListener("click", () => {
+        resetDetectedDigit();
+
+        const dataURL = canvas.toDataURL("image/png");
+        const blob = dataURItoBlob(dataURL);
+
+        const formData = new FormData();
+        formData.append("image", blob, "canvas.png");
+
+        sendImageToServer(formData);
+      });
+
+      function sendImageToServer(formData) {
+        fetch("/detect-digit", {
+          method: "POST",
+          body: formData,
+        })
+          .then(handleServerResponse)
+          .catch(panic);
+      }
+
+      function handleServerResponse(response) {
+        if (response.status != 200) {
+          response.text().then(panic).catch(panic);
+        } else {
+          response
+            .json()
+            .then((data) => {
+              console.log("Response Data:", data);
+              const { detected, plot_data_url } = data;
+
+              detectedDigit.innerHTML = detected;
+
+              if (plot_data_url) {
+                const plot = new Image(450, 320);
+                plot.id = "plot";
+                plot.src = plot_data_url;
+                resultsContainer.appendChild(plot);
+              }
+            })
+            .catch(panic);
+        }
+      }
+
+      function panic(error) {
+        console.error(error);
+        alert("Something went wrong.");
+      }
+
+      function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(",")[1]);
+        const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+        const ab = new ArrayBuffer(byteString.length);
+        return new Blob([ab], { type: mimeString });
+      }
+    </script>
+  </body>
+</html>
